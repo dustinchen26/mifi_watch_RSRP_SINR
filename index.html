@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSRP, SINR, RX0-3 RSRP Graph</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+    }
+    canvas {
+      max-width: 100%;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>RSRP, SINR, RX0-3 RSRP Graph</h1>
+  <p>請在下面的文本框中輸入 MobaXterm 日誌資料，然後點擊“繪製圖表”來顯示折線圖。</p>
+
+  <textarea id="logInput"></textarea>
+  <button onclick="generateGraph()">繪製圖表</button>
+
+  <canvas id="lineChart"></canvas>
+
+  <script>
+    function parseLogData(logData) {
+      const timeLabels = [];
+      const rsrpData = [];
+      const sinrData = [];
+      const rx0Data = [];
+      const rx1Data = [];
+      const rx2Data = [];
+      const rx3Data = [];
+
+      const logLines = logData.split('\n');
+      logLines.forEach(line => {
+        // 解析每行中的時間、RSRP、SINR、RX0-3 RSRP
+        const timeMatch = line.match(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/);
+        const rsrpMatch = line.match(/RSRP\s*(-?\d{1,3})\s*dBm/);
+        const sinrMatch = line.match(/SINR\s*(\d{1,3})\s*dB/);
+        const rx0Match = line.match(/RX0\s*rsrp:\s*(-?\d{1,3})\s*dBm/);
+        const rx1Match = line.match(/RX1\s*rsrp:\s*(-?\d{1,3})\s*dBm/);
+        const rx2Match = line.match(/RX2\s*rsrp:\s*(-?\d{1,3})\s*dBm/);
+        const rx3Match = line.match(/RX3\s*rsrp:\s*(-?\d{1,3})\s*dBm/);
+
+        if (timeMatch && rsrpMatch && sinrMatch && rx0Match && rx1Match && rx2Match && rx3Match) {
+          timeLabels.push(timeMatch[0]);
+          rsrpData.push(parseInt(rsrpMatch[1]));
+          sinrData.push(parseInt(sinrMatch[1]));
+          rx0Data.push(parseInt(rx0Match[1]));
+          rx1Data.push(parseInt(rx1Match[1]));
+          rx2Data.push(parseInt(rx2Match[1]));
+          rx3Data.push(parseInt(rx3Match[1]));
+        }
+      });
+
+      // Log the parsed data to the console to check
+      console.log("Parsed Data:");
+      console.log("Time Labels:", timeLabels);
+      console.log("RSRP Data:", rsrpData);
+      console.log("SINR Data:", sinrData);
+      console.log("RX0 Data:", rx0Data);
+      console.log("RX1 Data:", rx1Data);
+      console.log("RX2 Data:", rx2Data);
+      console.log("RX3 Data:", rx3Data);
+
+      return {
+        labels: timeLabels,
+        datasets: [
+          { label: 'RSRP', data: rsrpData, borderColor: 'red', fill: false },
+          { label: 'SINR', data: sinrData, borderColor: 'blue', fill: false },
+          { label: 'RX0 RSRP', data: rx0Data, borderColor: 'green', fill: false },
+          { label: 'RX1 RSRP', data: rx1Data, borderColor: 'orange', fill: false },
+          { label: 'RX2 RSRP', data: rx2Data, borderColor: 'purple', fill: false },
+          { label: 'RX3 RSRP', data: rx3Data, borderColor: 'brown', fill: false }
+        ]
+      };
+    }
+
+    function generateGraph() {
+      const logInput = document.getElementById('logInput').value;
+      const chartData = parseLogData(logInput);
+
+      // Log the chart data to verify it's correct
+      console.log("Chart Data for Chart.js:", chartData);
+
+      const ctx = document.getElementById('lineChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: chartData,
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: 'RSRP, SINR, RX0-3 RSRP over Time'
+            },
+            legend: {
+              position: 'top',
+            },
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Time'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'dB'
+              },
+              suggestedMin: -100,
+              suggestedMax: 0
+            }
+          }
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
