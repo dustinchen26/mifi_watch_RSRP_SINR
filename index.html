@@ -1,3 +1,9 @@
+<!-- 
+  Copyright © [2023] [Dustin_Chen]. All rights reserved.
+  Author: Dustin_Chen
+  Email:  Dustin_Chen@compal.com or chuhpsdustin@gmail.com
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,6 +11,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>數據解析器與圖表</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -59,6 +66,7 @@
   <textarea id="inputText" placeholder="請在此處輸入數據..."></textarea>
   <br>
   <button onclick="parseData()">解析數據</button>
+  <button onclick="exportToExcel()">導出到 Excel</button>
 </div>
 
 <div class="container">
@@ -207,7 +215,7 @@
             {
               label: 'RX3',
               data: rx3s,
-              borderColor: 'rgb(255, 205, 86)',
+              borderColor: 'rgb(54, 162, 235)',
               fill: false,
             }
           ]
@@ -221,7 +229,7 @@
             },
             y: { 
               beginAtZero: false, 
-              title: { display: true, text: 'Value' }
+              title: { display: true, text: 'RSRP / RX Power' }
             }
           }
         }
@@ -256,6 +264,11 @@
         }
       });
     }
+  }
+  function exportToExcel() {
+    const table = document.getElementById("outputTable");
+    const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet 1" });
+    XLSX.writeFile(wb, "data.xlsx");
   }
 </script>
 
