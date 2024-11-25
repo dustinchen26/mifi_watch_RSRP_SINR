@@ -19,11 +19,19 @@
       padding: 10px;
       font-size: 16px;
     }
-    .result {
+    table {
+      width: auto;
+      border-collapse: collapse;
       margin-top: 20px;
-      padding: 10px;
+      table-layout: auto; /* 讓表格寬度根據內容自動調整 */
+    }
+    th, td {
+      padding: 5px 10px; /* 減少內邊距，讓表格更緊湊 */
+      text-align: left; /* 讓內容左對齊 */
       border: 1px solid #ccc;
-      background-color: #f9f9f9;
+    }
+    th {
+      background-color: #f2f2f2;
     }
   </style>
 </head>
@@ -33,7 +41,21 @@
 <textarea id="inputText" placeholder="請在此處輸入數據..."></textarea><br>
 <button onclick="parseData()">解析數據</button>
 
-<div id="output" class="result"></div>
+<table id="outputTable">
+  <thead>
+    <tr>
+      <th>Time</th>
+      <th>RSRP</th>
+      <th>SINR</th>
+      <th>RX0</th>
+      <th>RX1</th>
+      <th>RX2</th>
+      <th>RX3</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
 
 <script>
   function parseData() {
@@ -44,6 +66,10 @@
     let time1 = '';
     let rsrpAndSinr = '';
     let rxData = { rx0: '', rx1: '', rx2: '', rx3: '' };
+
+    // 清空表格
+    const tbody = document.querySelector('#outputTable tbody');
+    tbody.innerHTML = '';
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
@@ -78,15 +104,28 @@
 
       // 每次處理完一行後，如果我們已經有所有的數據，組裝並顯示
       if (time1 && rsrpAndSinr && rxData.rx0 && rxData.rx1 && rxData.rx2 && rxData.rx3) {
-        output += `<p>time = ${time1}, ${rsrpAndSinr}, ${rxData.rx0}, ${rxData.rx1}, ${rxData.rx2}, ${rxData.rx3}</p>`;
+        // 創建新行並添加至表格
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+          <td>${time1}</td>
+          <td>${rsrpAndSinr.split(', ')[0]}</td>
+          <td>${rsrpAndSinr.split(', ')[1]}</td>
+          <td>${rxData.rx0}</td>
+          <td>${rxData.rx1}</td>
+          <td>${rxData.rx2}</td>
+          <td>${rxData.rx3}</td>
+        `;
+        tbody.appendChild(newRow);
+
         // 重置數據以便處理下一組數據
         time1 = rsrpAndSinr = '';
         rxData = { rx0: '', rx1: '', rx2: '', rx3: '' };
       }
     }
 
-    // 顯示結果
-    document.getElementById('output').innerHTML = output || '<p>未能解析出任何有效數據。</p>';
+    if (tbody.innerHTML === '') {
+      tbody.innerHTML = '<tr><td colspan="7">未能解析出任何有效數據。</td></tr>';
+    }
   }
 </script>
 
