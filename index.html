@@ -9,24 +9,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>數據解析器與圖表</title>
+  <title>mifi_watch_RSRP_SINR</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
+        body {
+            line-height: 1.2;
+            font-size: 14px;
+            font-family: Roboto, sans-serif;
+            margin: 20px;			
+        }	
+	
     textarea {
-      width: calc(100% - 150px);
-      height: 300px;
-      font-size: 16px;
+      width: calc(100% - 450px);
+      height: 200px;
+      font-size: 14px;
       margin-right: 10px;
       display: inline-block;
     }
     button {
-      padding: 10px;
-      font-size: 16px;
+      line-height: 1;	
+      padding: 4px;
+      font-size: 14px;
       display: inline-block;
     }
     .container {
@@ -57,16 +61,34 @@
       max-width: 100%;
       margin-top: 20px;
     }
+	
+    .red {
+      color: red;  /* 設定文字顏色為紅色 */
+    }	
   </style>
 </head>
 <body>
 
-<h1>數據解析器與圖表</h1>
-<div>
-  <textarea id="inputText" placeholder="請在此處輸入數據..."></textarea>
+<h2>mifi_watch_RSRP_SINR</h2>
+
+  <p style="margin: 0;">Author: Dustin_Chen, email: <a href="mailto:Dustin_Chen@compal.com"
+      style="line-height: 1;">Dustin_Chen@compal.com</a> or <a href="mailto:chuhpsdustin@gmail.com"
+      style="line-height: 1;">chuhpsdustin@gmail.com</a></p>
+
+  <ul>
+    <li><strong>【How to use】</strong>
+      <ul>
+        <li>step0. MobaXterm => Session -> Shell -> Terminal settings -> Select "Log terminal output to": _DesktopDir_</li>
+        <li>step1. 【<span class="red">adb shell</span>】 into mifi </li>
+		<li>step2. Set the UE time correctly. ex: <span class="red">date -s "2024-08-20 09:03:50"</span> </li>			
+        <li>step3. "Mifi" use this command to run every 5 seconds 【<span class="red">watch -n 5 'echo "$(date "+%Y-%m-%d %H:%M:%S")"; atcli at+bnrinfo'</span>】
+        </li>
+        <li>step4. paste the _DesktopDir_ 【output file content】 below to parse</li>
+			<div>
+  <textarea id="inputText" placeholder="Paste the output file content here..."></textarea>
   <br>
-  <button onclick="parseData()">解析數據</button>
-  <button onclick="exportToExcel()">導出到 Excel</button>
+  <button onclick="parseData()">Parse_input</button>
+  <button onclick="exportToExcel()">export_Excel</button>
 </div>
 
 <div class="container">
@@ -93,6 +115,14 @@
   <tbody>
   </tbody>
 </table>
+      </ul>
+    </li>
+
+
+  </ul>
+
+	  
+
 
 <script>
   let rsrpChart = null;
